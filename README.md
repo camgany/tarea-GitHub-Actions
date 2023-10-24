@@ -1,3 +1,6 @@
+## Nombre: Camila Alejandra Grandy Camacho
+### Codigo: 56784
+### Materia: Certificación DevOps
 # Configuración de GitHub Actions para una Aplicación React
 
 Este README tiene como objetivo proporcionar instrucciones sobre cómo configurar tres flujos de trabajo de GitHub Actions para una aplicación React desde cero. Estos flujos de trabajo incluyen tres trabajos: "test," "build," y "deploy." Además, se configurarán para que puedan ejecutarse manualmente, según un cron programado (cada lunes a las 15:45 y a las 20:00, hora de Bolivia), y en las ramas "feature/something," "feature/something1," y en las ramas de versión "release/1.0," "release/1.1," etc.
