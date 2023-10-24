@@ -1,0 +1,28 @@
+name: Deploy Workflow
+
+on:
+  push:
+    branches:
+      - release/*
+  schedule:
+    - cron: '0 20 * * 1'  # Ejecutar cada lunes a las 20:00 UTC (15:00 hora Bolivia)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código fuente
+        uses: actions/checkout@v2
+
+      - name: Verificar la rama
+        run: |
+          if [[ ${{ github.ref }} =~ ^refs/heads/release/1\.0 ]]; then
+            # Agrega aquí los comandos para implementar en la rama release/1.0
+            echo "Desplegar en release/1.0"
+          elif [[ ${{ github.ref }} =~ ^refs/heads/release/1\.1 ]]; then
+            # Agrega aquí los comandos para implementar en la rama release/1.1
+            echo "Desplegar en release/1.1"
+          else
+            echo "No se requiere despliegue en esta rama."
+          fi

@@ -1,0 +1,23 @@
+name: Build Workflow
+
+on:
+  push:
+    branches:
+      - feature/*
+      - release/*
+  schedule:
+    - cron: '45 15 * * 1'  # Ejecutar cada lunes a las 15:45 UTC (10:45 hora Bolivia)
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código fuente
+        uses: actions/checkout@v2
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Construir la aplicación
+        run: npm run build
