@@ -6,7 +6,10 @@ on:
       - feature/*
       - release/*
   schedule:
-    - cron: '15 20 * * 1'  # Ejecutar cada lunes a las 20:15 UTC (15:15 hora Bolivia)
+      - cron: "45 19 * * 1"
+      - cron: "00 00 * * 1"
+  
+  workflow_dispatch: {}
 
 jobs:
   test:

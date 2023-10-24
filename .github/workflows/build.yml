@@ -6,8 +6,9 @@ on:
       - feature/*
       - release/*
   schedule:
-    - cron: '45 15 * * 1'  # Ejecutar cada lunes a las 15:45 UTC (10:45 hora Bolivia)
-
+      - cron: "45 19 * * 1"
+      - cron: "00 00 * * 1"
+  workflow_dispatch: {}
 jobs:
   build:
     runs-on: ubuntu-latest
