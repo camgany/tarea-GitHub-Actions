@@ -1,70 +1,121 @@
-# Getting Started with Create React App
+# Configuración de GitHub Actions para una Aplicación React
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Este README tiene como objetivo proporcionar instrucciones sobre cómo configurar tres flujos de trabajo de GitHub Actions para una aplicación React desde cero. Estos flujos de trabajo incluyen tres trabajos: "test," "build," y "deploy." Además, se configurarán para que puedan ejecutarse manualmente, según un cron programado (cada lunes a las 15:45 y a las 20:00, hora de Bolivia), y en las ramas "feature/something," "feature/something1," y en las ramas de versión "release/1.0," "release/1.1," etc.
 
-## Available Scripts
+## Configuración de los flujos de trabajo
 
-In the project directory, you can run:
+A continuación, se detallarán los pasos para configurar los flujos de trabajo de GitHub Actions.
 
-### `npm start`
-a
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 1. Crear archivos YAML para los flujos de trabajo
+En el directorio raíz del repositorio, se creo tres archivos YAML separados para cada flujo de trabajo. Los archivos:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+.github/workflows/test.yml
+.github/workflows/build.yml
+.github/workflows/deploy.yml
 
-### `npm test`
+### 2. Configurar el flujo de trabajo "Test"
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+En el archivo test.yml, se tiene el siguiente contenido:
+    
+    ```yaml
+    name: Test Workflow
 
-### `npm run build`
+on:
+  push:
+    branches:
+      - feature/*
+      - release/*
+  schedule:
+      - cron: "45 19 * * 1"
+      - cron: "00 00 * * 1"
+  
+  workflow_dispatch: {}
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+jobs:
+  test:
+    runs-on: ubuntu-latest
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+    steps:
+      - name: Checkout código fuente
+        uses: actions/checkout@v2
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+      - name: Instalar dependencias
+        run: npm install
 
-### `npm run eject`
+      - name: Ejecutar pruebas
+        run: npm test
+    ``` 
+Este flujo de trabajo se ejecutará automáticamente en las ramas que coincidan con el patrón feature/*.
+### 3. Configurar el flujo de trabajo "Build"
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+En el archivo build.yml, se tiene el siguiente contenido:
+        
+        ```yaml
+        name: Build Workflow
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+on:
+  push:
+    branches:
+      - feature/*
+      - release/*
+  schedule:
+      - cron: "45 19 * * 1"
+      - cron: "00 00 * * 1"
+  workflow_dispatch: {}
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+    steps:
+      - name: Checkout código fuente
+        uses: actions/checkout@v2
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+      - name: Instalar dependencias
+        run: npm install
 
-## Learn More
+      - name: Construir la aplicación
+        run: npm run build
+    ```
+Este flujo de trabajo se ejecutará automáticamente en las ramas que coincidan con los patrones feature/* y release/*. Además, se ejecutará manualmente según un cron programado (cada lunes a las 15:45 y a las 20:00, hora de Bolivia).
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### 4. Configurar el flujo de trabajo "Deploy"
+En el archivo deploy.yml, se tiene el siguiente contenido:
+            
+            ```yaml
+          name: Deploy Workflow
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+on:
+  push:
+    branches:
+      - release/*
+  schedule:
+      - cron: "45 19 * * 1"
+      - cron: "00 00 * * 1"
+  workflow_dispatch: {}
 
-### Code Splitting
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+    steps:
+      - name: Checkout código fuente
+        uses: actions/checkout@v2
 
-### Analyzing the Bundle Size
+      - name: Verificar la rama
+        run: |
+          if [[ ${{ github.ref }} =~ ^refs/heads/release/1\.0 ]]; then
+            # Agrega aquí los comandos para implementar en la rama release/1.0
+            echo "Desplegar en release/1.0"
+          elif [[ ${{ github.ref }} =~ ^refs/heads/release/1\.1 ]]; then
+            # Agrega aquí los comandos para implementar en la rama release/1.1
+            echo "Desplegar en release/1.1"
+          else
+            echo "No se requiere despliegue en esta rama."
+          fi
+            ```
+        Este flujo de trabajo se ejecutará automáticamente en las ramas de versión que coincidan con el patrón release/*, según el cron programado y de forma manual a través de la acción "Run workflow."
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Uso de los flujos de trabajo
+Una vez que hayas creado estos archivos YAML en tu repositorio, los flujos de trabajo estarán listos para su uso. Puedes ejecutarlos manualmente desde la pestaña "Actions" en tu repositorio de GitHub o automáticamente según las condiciones especificadas.
 
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+¡Ahora tu proyecto de React está configurado para realizar pruebas, construir y desplegar de manera automatizada en las circunstancias deseadas! Asegúrate de personalizar los comandos de despliegue en el flujo de trabajo "Deploy" según las necesidades de tu proyecto.
